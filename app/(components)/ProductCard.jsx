@@ -8,13 +8,20 @@ import {
   deleteCookie,
   hasCookie,
 } from "cookies-next/server";
+import Button from "./Button";
 
 async function ProductCard({ product }) {
   async function addToCart(fromData) {
     "use server";
     const data = await getCookie("cart", { cookies });
     let cart = data ? JSON.parse(data) : [];
-    cart = [...cart, product];
+    if (cart.find((item) => item.id == product.id)) {
+      cart = cart.map((item) =>
+        item.id == product.id ? { ...item, qty: item.qty + 1 } : item,
+      );
+    } else {
+      cart = [...cart, { ...product, qty: 1 }];
+    }
     await setCookie("cart", JSON.stringify(cart), { cookies });
     console.log("🚀 ~ addToCart ~ cart:", cart);
   }
@@ -41,9 +48,7 @@ async function ProductCard({ product }) {
           </div>
 
           <form action={addToCart}>
-            <button type="submit" className="product-card__button">
-              Add to cart
-            </button>
+          <Button ></Button>
           </form>
         </div>
       </div>
